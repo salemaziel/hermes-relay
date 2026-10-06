@@ -3359,6 +3359,7 @@
     </plurals>
     <string name="model_picker_refreshing">Actualizando</string>
     <string name="model_picker_refresh">Actualizar</string>
+    <string name="model_price_free">Gratis</string>
     <string name="model_picker_other">Otro</string>
     <string name="model_picker_model">Modelo</string>
     <string name="input_voice_session">sesión de voz</string>

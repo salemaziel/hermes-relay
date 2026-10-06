@@ -3664,6 +3664,7 @@
     </plurals>
     <string name="model_picker_refreshing">更新中…</string>
     <string name="model_picker_refresh">更新</string>
+    <string name="model_price_free">無料</string>
     <string name="model_picker_other">その他</string>
     <string name="model_picker_model">モデル</string>
     <string name="input_voice_session">音声セッション</string>

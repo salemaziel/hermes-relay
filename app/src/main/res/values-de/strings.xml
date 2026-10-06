@@ -3668,6 +3668,7 @@
     </plurals>
     <string name="model_picker_refreshing">Wird aktualisiert</string>
     <string name="model_picker_refresh">Aktualisieren</string>
+    <string name="model_price_free">Kostenlos</string>
     <string name="model_picker_other">Sonstige</string>
     <string name="model_picker_model">Modell</string>
     <string name="input_voice_session">Sprach-Session</string>

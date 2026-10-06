@@ -3511,6 +3511,7 @@
     </plurals>
     <string name="model_picker_refreshing">Atualizando</string>
     <string name="model_picker_refresh">Atualizar</string>
+    <string name="model_price_free">Grátis</string>
     <string name="model_picker_other">Outro</string>
     <string name="model_picker_model">Modelo</string>
     <string name="input_voice_session">sessão de voz</string>

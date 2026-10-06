@@ -138,6 +138,9 @@ import com.hermesandroid.relay.network.upstream.ApiModelOption
 import com.hermesandroid.relay.network.upstream.ChatMode
 import com.hermesandroid.relay.network.upstream.GatewayAvailability
 import com.hermesandroid.relay.network.upstream.ReasoningEfforts
+import com.hermesandroid.relay.network.upstream.joinPickerSecondary
+import com.hermesandroid.relay.network.upstream.modelPricingLabel
+import com.hermesandroid.relay.network.upstream.pricingForModel
 import com.hermesandroid.relay.network.relay.RelayVoiceClient
 import com.hermesandroid.relay.network.relay.RealtimeVoiceConfig
 import com.hermesandroid.relay.network.relay.VoiceOutputConfig
@@ -1128,6 +1131,7 @@ fun ChatScreen(
     val modelOptionsLoading by chatViewModel.modelOptionsLoading.collectAsState()
     val modelOptionsRefreshing by chatViewModel.modelOptionsRefreshing.collectAsState()
     val modelOptionsError by chatViewModel.modelOptionsError.collectAsState()
+    val modelPricing by chatViewModel.modelPricing.collectAsState()
     val modelSelectionConfirmation by chatViewModel.modelSelectionConfirmation.collectAsState()
     val reasoningCapabilityRevision by chatViewModel.reasoningCapabilityRevision.collectAsState()
     val selectedModelOverride by chatViewModel.selectedModelOverride.collectAsState()
@@ -4402,6 +4406,7 @@ fun ChatScreen(
             val serverDefaultLabel = stringResource(R.string.chat_server_default)
             val notOnPlanLabel = stringResource(R.string.chat_not_on_plan)
             val needsSetupLabel = stringResource(R.string.chat_needs_setup)
+            val freePriceLabel = stringResource(R.string.model_price_free)
             val modelDefaultLabel = stringResource(R.string.chat_model_label)
             val modelPickerOptions = remember(
                 modelProviders,
@@ -4415,6 +4420,8 @@ fun ChatScreen(
                 serverDefaultModelDetail,
                 hasModelChoices,
                 isGatewayTransport,
+                modelPricing,
+                freePriceLabel,
             ) {
                 if (!isGatewayTransport && !hasModelChoices && fallbackModelDetail.isNullOrBlank()) {
                     emptyList()
@@ -4439,17 +4446,28 @@ fun ChatScreen(
                                     // can't pick (free-tier / no credits) — disable
                                     // them so a switch can't 400 / credits-fail.
                                     val unavailable = model in provider.unavailableModels
+                                    // Rates are decoration: they ride alongside
+                                    // the availability warning rather than
+                                    // replacing it, since that warning is why a
+                                    // row may be unselectable.
+                                    val priceLabel = modelPricingLabel(
+                                        pricingForModel(modelPricing, provider.slug, model),
+                                        freePriceLabel,
+                                    )
                                     add(
                                         ChatInputPickerOption(
                                             label = model,
                                             value = model,
                                             provider = provider.slug,
                                             group = provider.name,
-                                            secondary = when {
-                                                unavailable -> notOnPlanLabel
-                                                !provider.authenticated -> provider.warning ?: needsSetupLabel
-                                                else -> null
-                                            },
+                                            secondary = joinPickerSecondary(
+                                                when {
+                                                    unavailable -> notOnPlanLabel
+                                                    !provider.authenticated -> provider.warning ?: needsSetupLabel
+                                                    else -> null
+                                                },
+                                                priceLabel,
+                                            ),
                                             selected = sessionModelState.pickerModel == model &&
                                                 sessionPickerProvider.equals(provider.slug, ignoreCase = true),
                                             enabled = !unavailable,

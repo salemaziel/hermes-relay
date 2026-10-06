@@ -79,6 +79,7 @@
     <string name="model_picker_model">Модель</string>
     <string name="model_picker_refreshing">Обновление</string>
     <string name="model_picker_refresh">Обновить</string>
+    <string name="model_price_free">Бесплатно</string>
     <string name="demo_city_name">Бухта Авроры</string>
     <string name="demo_weather">Переменная облачность</string>
     <string name="demo_wind">Ветер</string>

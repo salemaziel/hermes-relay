@@ -3963,6 +3963,7 @@
     <string name="model_picker_model">Model</string>
     <string name="model_picker_refreshing">Refreshing</string>
     <string name="model_picker_refresh">Refresh</string>
+    <string name="model_price_free">Free</string>
     <string name="demo_city_name">Aurora Bay</string>
     <string name="demo_weather">Partly cloudy</string>
     <string name="demo_wind">Wind</string>

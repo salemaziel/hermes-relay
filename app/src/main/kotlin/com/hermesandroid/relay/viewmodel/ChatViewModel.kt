@@ -116,6 +116,8 @@ import com.hermesandroid.relay.network.upstream.ApiModelRoutingException
 import com.hermesandroid.relay.network.upstream.ApiModelSelectionAck
 import com.hermesandroid.relay.network.upstream.HermesApiClient
 import com.hermesandroid.relay.network.upstream.ToolsetInfo
+import com.hermesandroid.relay.network.upstream.ModelPricing
+import com.hermesandroid.relay.network.upstream.ModelPricingRepository
 import com.hermesandroid.relay.network.upstream.isCurrentModelOptionsResponse
 import com.hermesandroid.relay.network.upstream.modelOptionsIdentityToPublish
 import com.hermesandroid.relay.network.upstream.parsePersonalityPrompts
@@ -1144,6 +1146,15 @@ class ChatViewModel : ViewModel() {
             .orEmpty()
     }
 
+    /**
+     * Per-1M-token rates for the picker, keyed by canonical provider then model
+     * id. Empty until [refreshModelPricing] resolves, and empty for providers
+     * that publish no public rate card -- the picker simply shows no price.
+     */
+    private val _modelPricing = MutableStateFlow<Map<String, Map<String, ModelPricing>>>(emptyMap())
+    val modelPricing: StateFlow<Map<String, Map<String, ModelPricing>>> = _modelPricing.asStateFlow()
+    private val modelPricingRepository = ModelPricingRepository()
+
     /** True only during an explicit user-requested dynamic model catalog refresh. */
     private val _modelOptionsRefreshing = MutableStateFlow(false)
     val modelOptionsRefreshing: StateFlow<Boolean> = _modelOptionsRefreshing.asStateFlow()
@@ -1276,6 +1287,7 @@ class ChatViewModel : ViewModel() {
                         _gatewayCurrentProvider.value = identity.provider
                     }
                     refreshRelayReasoningCapabilities(refresh = refresh)
+                    refreshModelPricing(it.providers)
                     android.util.Log.i(
                         "ChatViewModel",
                         "model.options${if (refresh) " refresh" else ""}: ${it.providers.size} providers, " +
@@ -1300,6 +1312,22 @@ class ChatViewModel : ViewModel() {
                 _modelOptionsLoading.value = false
                 if (refresh) _modelOptionsRefreshing.value = false
             }
+        }
+    }
+
+    /**
+     * Load per-1M-token rates for the providers the catalog just published.
+     *
+     * Decoration only: it never gates or delays the picker, and a provider whose
+     * rate card cannot be reached contributes nothing.
+     */
+    private fun refreshModelPricing(providers: List<GatewayModelProvider>) {
+        val slugs = providers.map { it.slug }.distinct()
+        if (slugs.isEmpty()) return
+        viewModelScope.launch {
+            val pricing = runCatching { modelPricingRepository.pricingFor(slugs) }
+                .getOrElse { emptyMap() }
+            if (pricing.isNotEmpty()) _modelPricing.value = pricing
         }
     }
 

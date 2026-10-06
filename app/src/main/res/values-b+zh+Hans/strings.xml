@@ -3599,6 +3599,7 @@
     </plurals>
     <string name="model_picker_refreshing">正在刷新</string>
     <string name="model_picker_refresh">刷新</string>
+    <string name="model_price_free">免费</string>
     <string name="model_picker_other">其他</string>
     <string name="model_picker_model">模型</string>
     <string name="input_voice_session">语音会话</string>
