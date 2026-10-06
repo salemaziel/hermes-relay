@@ -2022,6 +2022,23 @@ def pair_command(args) -> None:
             legacy_direct_relay=legacy_direct_relay,
         )
         if minted is not None:
+            # ADR 24 fallback: if the Android app ignores the multi-endpoint
+            # array and uses the top-level relay.url, it connects to LAN IP
+            # (unreachable off-LAN). Rewrite relay.url to the highest-priority
+            # Tailscale relay endpoint so v2 clients still connect.
+            if endpoints:
+                ts_relay_url = None
+                for ep in endpoints:
+                    if ep.get("role") == "tailscale":
+                        ts_relay = ep.get("relay", {})
+                        ts_relay_url = ts_relay.get("url") if isinstance(ts_relay, dict) else None
+                        break
+                if ts_relay_url:
+                    parsed_payload = json.loads(str(minted["qr_payload"]))
+                    if "relay" in parsed_payload and isinstance(parsed_payload["relay"], dict):
+                        parsed_payload["relay"]["url"] = ts_relay_url
+                        minted["qr_payload"] = json.dumps(parsed_payload, separators=(",", ":"))
+                        minted["relay_url"] = ts_relay_url
             payload = str(minted["qr_payload"])
             invite_url = str(minted["pairing_url"])
             parsed_payload = json.loads(payload)

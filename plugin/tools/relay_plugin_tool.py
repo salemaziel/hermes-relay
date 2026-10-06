@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from typing import Any
 
 from ..mobile_plugin_store import MobilePluginStore, MobilePluginStoreError
@@ -154,10 +155,10 @@ _SCHEMAS: dict[str, dict[str, Any]] = {
 
 
 _HANDLERS = {
-    "relay_plugin_draft": lambda args, **kw: relay_plugin_draft(**args),
-    "relay_plugin_publish": lambda args, **kw: relay_plugin_publish(**args),
-    "relay_plugin_remove": lambda args, **kw: relay_plugin_remove(**args),
-    "relay_plugin_list": lambda args, **kw: relay_plugin_list(),
+    "relay_plugin_draft": lambda args, **kw: json.dumps(relay_plugin_draft(**args)),
+    "relay_plugin_publish": lambda args, **kw: json.dumps(relay_plugin_publish(**args)),
+    "relay_plugin_remove": lambda args, **kw: json.dumps(relay_plugin_remove(**args)),
+    "relay_plugin_list": lambda args, **kw: json.dumps(relay_plugin_list()),
 }
 
 
